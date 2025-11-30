@@ -1,49 +1,26 @@
 from django.db import models
 
-
-class Actor(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
-
 class Genre(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name: str = models.CharField(max_length=100)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
-
-
-class CinemaHall(models.Model):
-    name = models.CharField(max_length=255)
-    rows = models.PositiveIntegerField()
-    seats_in_row = models.PositiveIntegerField()
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def capacity(self):
-        return self.rows * self.seats_in_row
 
 
 class Movie(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    duration = models.PositiveIntegerField()
-    actors = models.ManyToManyField(Actor, related_name="movies")
-    genres = models.ManyToManyField(Genre, related_name="movies")
+    title: str = models.CharField(max_length=255)
+    description: str = models.TextField()
+    release_year: int = models.IntegerField()
+    genre: Genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='movies')
+    actors: models.Manager = models.ManyToManyField("Actor", related_name='movies')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
-class MovieSession(models.Model):
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="sessions")
-    cinema_hall = models.ForeignKey(CinemaHall, on_delete=models.CASCADE, related_name="sessions")
-    show_time = models.DateTimeField()
+class Actor(models.Model):
+    name: str = models.CharField(max_length=150)
+    birth_year: int = models.IntegerField()
 
-    def __str__(self):
-        return f"{self.movie.title} @ {self.show_time.isoformat()}"
+    def __str__(self) -> str:
+        return self.name
